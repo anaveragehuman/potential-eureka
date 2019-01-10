@@ -20,11 +20,11 @@ class App extends Component {
         let api = 'https://api.giphy.com/v1/gifs/';
 
         if (this.state.search) {
-            api += 'search/';
+            api += 'search?q=';
         }
 
         api += this.state.endpoint;
-        api += `?api_key=${apikey}`;
+        api += `&api_key=${apikey}`;
         console.log(api);
         axios.get(api).then((response) => func(response));
     }
