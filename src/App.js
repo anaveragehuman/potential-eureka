@@ -24,7 +24,8 @@ class App extends Component {
         }
 
         api += this.state.endpoint;
-        api += `&api_key=${apikey}`;
+        api += (this.state.search ? '&' : '?') + `api_key=${apikey}`;
+
         console.log(api);
         axios.get(api).then((response) => func(response));
     }
@@ -32,27 +33,27 @@ class App extends Component {
     componentDidMount() {
         console.log(this.state.endpoint);
         this.getData((response) => {
-            this.setState({gifs: []});
-            for (let i of response.data.data) {
-                let old = this.state.gifs;
-                old.push(i.images.original.url);
-                this.setState({gifs: old});
-            }
+            this.setState({gifs: []}, () => {
+                for (let i of response.data.data) {
+                    let old = this.state.gifs;
+                    old.push(i.images.original.url);
+                    this.setState({gifs: old});
+                }
+            })
         })
     }
 
     changeEndpoint(event) {
         event.preventDefault();
         let tmp = event.target.children[0].value.split(' ').join('+');
-        this.setState({search: true, endpoint: tmp});
-        this.componentDidMount();
+        this.setState({search: true, endpoint: tmp}, this.componentDidMount);
     }
 
     render() {
         return (
             <div className="App">
                 <SearchField click={(e) => this.changeEndpoint(e)} val={this.state.endpoint} />
-                {this.state.gifs.map((element) => <Card gif={element} />)}
+                {this.state.gifs.map((element, i) => <Card key={i} gif={element} />)}
             </div>
         );
     }
