@@ -6,27 +6,34 @@ import axios from 'axios';
 import apikey from './api'
 
 class App extends Component {
-
-    getData(func) {
-        let api = 'https://api.giphy.com/v1/gifs/';
-        api += this.state.endpoint
-        api += `?api_key=${apikey}`
-        console.log(api);
-        axios.get(api).then((response) => func(response));
-    }
-
     constructor(props) {
         super(props);
         this.state = {
             endpoint: 'trending',
             gifs: [],  // list of URLs
+            search: false,
         }
     }
 
+    getData(func) {
+        console.log(this.state);
+        let api = 'https://api.giphy.com/v1/gifs/';
+
+        if (this.state.search) {
+            api += 'search/';
+        }
+
+        api += this.state.endpoint;
+        api += `?api_key=${apikey}`;
+        console.log(api);
+        axios.get(api).then((response) => func(response));
+    }
+
     componentDidMount() {
+        console.log(this.state.endpoint);
         this.getData((response) => {
-            let objs = response.data.data;
-            for (let i of objs) {
+            this.setState({gifs: []});
+            for (let i of response.data.data) {
                 let old = this.state.gifs;
                 old.push(i.images.original.url);
                 this.setState({gifs: old});
@@ -35,18 +42,16 @@ class App extends Component {
     }
 
     changeEndpoint(event) {
-        this.setState({endpoint: event.value});
-
-        if (event.keyCode === 13) {
-            this.componentDidMount();
-        }
+        event.preventDefault();
+        let tmp = event.target.children[0].value.split(' ').join('+');
+        this.setState({search: true, endpoint: tmp});
+        this.componentDidMount();
     }
 
     render() {
-        console.log(this.state.gifs);
         return (
             <div className="App">
-                <SearchField change={(e) => this.changeEndpoint(e)} val={this.state.endpoint} />
+                <SearchField click={(e) => this.changeEndpoint(e)} val={this.state.endpoint} />
                 {this.state.gifs.map((element) => <Card gif={element} />)}
             </div>
         );

@@ -3,7 +3,12 @@ import './App.css';
 
 class SearchField extends Component {
     render() {
-        return (<input onChange={this.props.change} value={this.props.val} />);
+        return (
+            <form onSubmit={this.props.click}>
+                <input defaultValue={this.props.val} type="text" />
+                <button type="submit">Search</button>
+            </form>
+                );
 
     }
 }
