@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Card from './Card';
+import SearchField from './SearchField';
 import axios from 'axios';
 import apikey from './api'
 
 class App extends Component {
 
-    getData(path, func) {
+    getData(func) {
         let api = 'https://api.giphy.com/v1/gifs/';
-        api += path;
+        api += this.state.endpoint
         api += `?api_key=${apikey}`
+        console.log(api);
         axios.get(api).then((response) => func(response));
     }
 
@@ -22,23 +23,30 @@ class App extends Component {
         }
     }
 
-    render() {
-        this.getData(this.state.endpoint, (response) => {
+    componentDidMount() {
+        this.getData((response) => {
             let objs = response.data.data;
             for (let i of objs) {
-                axios
-                    .get(i.embed_url)
-                    .then((response) => {
-                        let old = this.state.gifs;
-                        old.push(i.embed_url);
-                        this.setState({gifs: old});
-                    })
+                let old = this.state.gifs;
+                old.push(i.images.original.url);
+                this.setState({gifs: old});
             }
         })
+    }
 
-            console.log(this.state.gifs);
+    changeEndpoint(event) {
+        this.setState({endpoint: event.value});
+
+        if (event.keyCode === 13) {
+            this.componentDidMount();
+        }
+    }
+
+    render() {
+        console.log(this.state.gifs);
         return (
             <div className="App">
+                <SearchField change={(e) => this.changeEndpoint(e)} val={this.state.endpoint} />
                 {this.state.gifs.map((element) => <Card gif={element} />)}
             </div>
         );

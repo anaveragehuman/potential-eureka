@@ -4,7 +4,7 @@ class Card extends Component {
     render() {
         return (
             <div>
-                {this.props.gif}
+                <img src={this.props.gif} />
             </div>
         )
     }
